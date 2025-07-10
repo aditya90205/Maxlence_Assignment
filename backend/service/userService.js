@@ -240,18 +240,52 @@ export class UserService {
     }
   }
 
+  // static async getUsers(page = 1, limit = 10, search = "") {
+  //   try {
+  //     const offset = (page - 1) * limit;
+  //     const whereClause = search
+  //       ? {
+  //           [Op.or]: [
+  //             { firstName: { [Op.like]: `%${search}%` } },
+  //             { lastName: { [Op.like]: `%${search}%` } },
+  //             { email: { [Op.like]: `%${search}%` } },
+  //           ],
+  //         }
+  //       : {};
+
+  //     const { rows: users, count } = await User.findAndCountAll({
+  //       where: whereClause,
+  //       limit: parseInt(limit),
+  //       offset: parseInt(offset),
+  //       order: [["createdAt", "DESC"]],
+  //     });
+
+  //     return {
+  //       users,
+  //       totalUsers: count,
+  //       totalPages: Math.ceil(count / limit),
+  //       currentPage: parseInt(page),
+  //     };
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
   static async getUsers(page = 1, limit = 10, search = "") {
     try {
       const offset = (page - 1) * limit;
-      const whereClause = search
-        ? {
-            [Op.or]: [
-              { firstName: { [Op.like]: `%${search}%` } },
-              { lastName: { [Op.like]: `%${search}%` } },
-              { email: { [Op.like]: `%${search}%` } },
-            ],
-          }
-        : {};
+      let whereClause = { isActive: true }; // Only active users
+
+      if (search) {
+        whereClause = {
+          ...whereClause,
+          [Op.or]: [
+            { firstName: { [Op.like]: `%${search}%` } },
+            { lastName: { [Op.like]: `%${search}%` } },
+            { email: { [Op.like]: `%${search}%` } },
+          ],
+        };
+      }
 
       const { rows: users, count } = await User.findAndCountAll({
         where: whereClause,
@@ -309,8 +343,9 @@ export class UserService {
         throw new Error("User not found");
       }
 
-      await user.update({ isActive: false });
-      return { message: "User deactivated successfully" };
+      // await user.update({ isActive: false });
+      await user.destroy();
+      return { message: "User deleted successfully" };
     } catch (error) {
       throw error;
     }
