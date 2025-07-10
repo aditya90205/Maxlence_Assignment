@@ -1,4 +1,5 @@
 import { UserService } from "../service/userService.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const registerUser = async (req, res) => {
   try {

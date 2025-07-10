@@ -64,7 +64,12 @@ const ProfilePage = () => {
         formData.append("profileImage", profileImage);
       }
 
+      console.log("Profile update response...");
+
       const response = await userService.updateProfile(formData);
+
+      console.log("Profile update response:", response);
+
       updateUser(response.data.user);
       toast.success("Profile updated successfully!");
       setIsEditing(false);

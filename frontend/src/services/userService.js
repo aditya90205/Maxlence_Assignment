@@ -17,11 +17,15 @@ export const userService = {
 
   // Update user profile
   updateProfile: async (formData) => {
+    console.log("Updating profile with formData:", formData);
+    
     const response = await api.put("/user/profile", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+    console.log("Profile update response:", response);
+    
     return response.data;
   },
 
