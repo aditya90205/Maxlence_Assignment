@@ -377,7 +377,7 @@ const EmailVerificationPage = () => {
                 <Link to="/register">
                   <Button variant="primary" size="lg" className="w-full">
                     <Mail size={16} className="mr-2" />
-                    Get new verification link
+                    Register with new email
                   </Button>
                 </Link>
               )}

@@ -12,6 +12,7 @@ import {
   refreshToken,
   logout,
   getCurrentUser,
+  resendVerificationEmail,
 } from "../controller/user.controller.js";
 import {
   validateRegistration,
@@ -46,6 +47,12 @@ router.post(
 );
 router.post("/login", loginLimiter, validateLogin, loginUser);
 router.get("/verify-email", verifyEmail);
+router.post(
+  "/resend-verification",
+  passwordResetLimiter,
+  validateForgotPassword,
+  resendVerificationEmail
+);
 router.post(
   "/forgot-password",
   passwordResetLimiter,

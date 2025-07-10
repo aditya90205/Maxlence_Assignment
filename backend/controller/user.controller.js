@@ -42,10 +42,20 @@ export const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: error.message,
-    });
+    // Handle email verification error specifically
+    if (error.code === "EMAIL_NOT_VERIFIED") {
+      res.status(403).json({
+        success: false,
+        message: error.message,
+        code: "EMAIL_NOT_VERIFIED",
+        email: error.email,
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: error.message,
+      });
+    }
   }
 };
 
@@ -251,6 +261,23 @@ export const getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await UserService.resendVerificationEmail(email);
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error) {
+    res.status(400).json({
       success: false,
       message: error.message,
     });

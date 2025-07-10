@@ -1,9 +1,36 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
+import { authService } from "../services/authService.js";
 import Button from "../components/Button.jsx";
+import toast from "react-hot-toast";
 
 const EmailVerificationSentPage = () => {
+  const [isResending, setIsResending] = useState(false);
+  const location = useLocation();
+
+  // Get email from location state if available
+  const registeredEmail = location.state?.email;
+  const handleResendEmail = async () => {
+    if (!registeredEmail) {
+      toast.error("Email address not found. Please register again.");
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      await authService.resendVerificationEmail(registeredEmail);
+      toast.success("Verification email sent! Please check your inbox.");
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to send verification email"
+      );
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -43,11 +70,23 @@ const EmailVerificationSentPage = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <Link to="/register">
-                    <Button variant="primary" size="lg" className="w-full">
-                      Try with different email
+                  {registeredEmail ? (
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="w-full"
+                      onClick={handleResendEmail}
+                      loading={isResending}
+                    >
+                      Resend verification email
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link to="/register">
+                      <Button variant="primary" size="lg" className="w-full">
+                        Try with different email
+                      </Button>
+                    </Link>
+                  )}
 
                   <Link to="/login">
                     <Button variant="outline" size="lg" className="w-full">

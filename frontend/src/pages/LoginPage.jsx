@@ -29,6 +29,21 @@ const LoginPage = () => {
       navigate(from, { replace: true });
     } catch (error) {
       console.error("Login error:", error);
+
+      // Check if the error is due to email not being verified
+      if (
+        error.response?.status === 403 &&
+        error.response?.data?.code === "EMAIL_NOT_VERIFIED"
+      ) {
+        // Redirect to email verification flow instead of showing inline error
+        navigate("/verify-email-sent", {
+          state: {
+            email: error.response.data.email || data.email,
+            fromLogin: true,
+          },
+        });
+        return;
+      }
     } finally {
       setIsLoading(false);
     }

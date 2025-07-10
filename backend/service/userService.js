@@ -62,6 +62,16 @@ export class UserService {
         throw new Error("Account is deactivated");
       }
 
+      // Check if email is verified
+      if (!user.isEmailVerified) {
+        const error = new Error(
+          "Email not verified. Please check your email for verification link."
+        );
+        error.code = "EMAIL_NOT_VERIFIED";
+        error.email = user.email;
+        throw error;
+      }
+
       // Generate tokens
       const { accessToken, refreshToken } = generateTokens({ id: user.id });
 

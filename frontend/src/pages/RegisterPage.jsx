@@ -52,8 +52,10 @@ const RegisterPage = () => {
 
       await registerUser(formData);
       console.log("Registration successful");
-      
-      navigate("/verify-email-sent");
+
+      navigate("/verify-email-sent", {
+        state: { email: data.email },
+      });
     } catch (error) {
       console.error("Registration error:", error);
     } finally {
