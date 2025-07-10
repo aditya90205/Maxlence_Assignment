@@ -46,7 +46,16 @@ export const loginUser = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-    const user = await UserService.verifyEmail(token);
+    console.log("Email verification request received with token:", token);
+    console.log("Token length:", token?.length);
+    console.log("Token type:", typeof token);
+
+    // URL decode the token in case it was encoded
+    const decodedToken = decodeURIComponent(token);
+    console.log("Decoded token:", decodedToken);
+    console.log("Decoded token length:", decodedToken?.length);
+
+    const user = await UserService.verifyEmail(decodedToken);
 
     res.status(200).json({
       success: true,
@@ -54,6 +63,7 @@ export const verifyEmail = async (req, res) => {
       data: { user },
     });
   } catch (error) {
+    console.error("Email verification controller error:", error.message);
     res.status(400).json({
       success: false,
       message: error.message,

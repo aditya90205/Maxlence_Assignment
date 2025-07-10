@@ -29,6 +29,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
         // Redirect to frontend with tokens
         const redirectUrl = `${process.env.FRONTEND_URL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+        console.log("Redirecting to:", redirectUrl);
         res.redirect(redirectUrl);
       } catch (error) {
         console.error("Google OAuth callback error:", error);

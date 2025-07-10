@@ -19,6 +19,10 @@ export class UserService {
         throw new Error("User already exists with this email");
       }
 
+      // Generate verification token
+      const verificationToken = generateVerificationToken();
+      console.log("Generated verification token:", verificationToken);
+
       // Create user
       const user = await User.create({
         firstName,
@@ -26,9 +30,16 @@ export class UserService {
         email,
         password,
         profileImage: profileImagePath,
-        emailVerificationToken: generateVerificationToken(),
+        emailVerificationToken: verificationToken,
         emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       });
+
+      console.log(
+        "User created with email:",
+        email,
+        "and token:",
+        verificationToken
+      );
 
       // Send verification email
       await this.sendVerificationEmail(user);
@@ -89,6 +100,10 @@ export class UserService {
 
   static async verifyEmail(token) {
     try {
+      console.log("Verifying email with token:", token);
+      console.log("Token length:", token?.length);
+
+      // First, try to find a user with this verification token that hasn't expired
       const user = await User.findOne({
         where: {
           emailVerificationToken: token,
@@ -96,17 +111,62 @@ export class UserService {
         },
       });
 
-      if (!user) {
-        throw new Error("Invalid or expired verification token");
+      console.log(
+        "User found for verification:",
+        user ? user.email : "No user found"
+      );
+
+      if (user) {
+        // Check if user is already verified
+        if (user.isEmailVerified) {
+          console.log("User is already verified:", user.email);
+          return user;
+        }
+
+        // Verify the user
+        user.isEmailVerified = true;
+        user.emailVerificationToken = null;
+        user.emailVerificationExpires = null;
+        await user.save();
+
+        console.log("Email verification successful for user:", user.email);
+        return user;
       }
 
-      user.isEmailVerified = true;
-      user.emailVerificationToken = null;
-      user.emailVerificationExpires = null;
-      await user.save();
+      // If no active token found, check for expired token
+      const expiredUser = await User.findOne({
+        where: {
+          emailVerificationToken: token,
+        },
+      });
 
-      return user;
+      if (expiredUser) {
+        console.log("Found user with expired token:", expiredUser.email);
+        console.log("Token expires at:", expiredUser.emailVerificationExpires);
+        console.log("Current time:", new Date());
+
+        // If the user is already verified, return success
+        if (expiredUser.isEmailVerified) {
+          console.log("User was already verified, returning success");
+          return expiredUser;
+        }
+
+        throw new Error(
+          "Verification token has expired. Please request a new verification email."
+        );
+      }
+
+      // If no user found with this token, check if maybe this is an issue with a user that's already verified
+      // but the frontend is trying to verify again (this can happen if user clicks link multiple times)
+      console.log(
+        "No user found with this token. This might be a token that was already used."
+      );
+
+      throw new Error(
+        "Invalid verification token. This link may have already been used or is invalid."
+      );
     } catch (error) {
+      console.error("Email verification error:", error.message);
       throw error;
     }
   }
@@ -284,6 +344,35 @@ export class UserService {
         await user.save();
       }
       return { message: "Logged out successfully" };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async resendVerificationEmail(email) {
+    try {
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) {
+        throw new Error("No user found with this email address");
+      }
+
+      if (user.isEmailVerified) {
+        throw new Error("Email is already verified");
+      }
+
+      // Generate new verification token
+      const verificationToken = generateVerificationToken();
+      user.emailVerificationToken = verificationToken;
+      user.emailVerificationExpires = new Date(
+        Date.now() + 24 * 60 * 60 * 1000
+      ); // 24 hours
+      await user.save();
+
+      // Send verification email
+      await this.sendVerificationEmail(user);
+
+      return { message: "Verification email sent successfully" };
     } catch (error) {
       throw error;
     }

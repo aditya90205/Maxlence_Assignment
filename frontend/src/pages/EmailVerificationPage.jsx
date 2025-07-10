@@ -14,7 +14,6 @@ const EmailVerificationPage = () => {
   const token = searchParams.get("token");
 
   console.log("Email verification token:", token);
-  
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -25,13 +24,35 @@ const EmailVerificationPage = () => {
       }
 
       try {
-        await authService.verifyEmail(token);
+        console.log("Making verification request with token:", token);
+        console.log("Token length:", token?.length);
+        const result = await authService.verifyEmail(token);
+        console.log("Verification response:", result);
         setVerificationStatus("success");
       } catch (error) {
+        console.error("Verification error:", error);
+        console.error("Error response:", error.response);
+        console.error("Error status:", error.response?.status);
         setVerificationStatus("error");
-        setErrorMessage(
-          error.response?.data?.message || "Email verification failed"
-        );
+
+        // Better error handling
+        if (error.response?.status === 400) {
+          const message =
+            error.response?.data?.message || "Email verification failed";
+          setErrorMessage(message);
+        } else if (error.response?.status === 404) {
+          setErrorMessage("Verification endpoint not found");
+        } else if (error.response?.status >= 500) {
+          setErrorMessage("Server error occurred. Please try again later.");
+        } else if (error.code === "NETWORK_ERROR") {
+          setErrorMessage("Network error. Please check your connection.");
+        } else {
+          setErrorMessage(
+            error.response?.data?.message ||
+              error.message ||
+              "Email verification failed"
+          );
+        }
       }
     };
 
@@ -119,19 +140,28 @@ const EmailVerificationPage = () => {
                 <p>This verification link may have:</p>
                 <ul className="text-left space-y-1">
                   <li>• Expired (links are valid for 24 hours)</li>
-                  <li>• Already been used</li>
+                  <li>• Already been used successfully</li>
                   <li>• Been corrupted during forwarding</li>
+                  <li>• Been generated for a different email</li>
                 </ul>
               </div>
             </div>
 
             <div className="space-y-3 pt-4">
-              <Link to="/register">
-                <Button variant="primary" size="lg" className="w-full">
-                  <Mail size={16} className="mr-2" />
-                  Get new verification link
-                </Button>
-              </Link>
+              {errorMessage?.includes("already been used") ? (
+                <Link to="/login">
+                  <Button variant="primary" size="lg" className="w-full">
+                    Sign in to your account
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/register">
+                  <Button variant="primary" size="lg" className="w-full">
+                    <Mail size={16} className="mr-2" />
+                    Get new verification link
+                  </Button>
+                </Link>
+              )}
 
               <Link to="/login">
                 <Button variant="outline" size="lg" className="w-full">
