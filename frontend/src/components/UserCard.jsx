@@ -13,16 +13,17 @@ const UserCard = ({
   const isCurrentUser = currentUser?.id === user.id;
   const canDelete = currentUser?.role === "admin" && !isCurrentUser;
 
-  const profileImageUrl = user.profileImage?.startsWith("http")
-    ? user.profileImage
-    : user.profileImage
-    ? `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${
-        user.profileImage
-      }`
-    : generateAvatarUrl(
-        user.getFullName?.() || `${user.firstName} ${user.lastName}`
-      );
+  // const profileImageUrl = user.profileImage?.startsWith("http")
+  //   ? user.profileImage
+  //   : user.profileImage
+  //   ? `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${
+  //       user.profileImage
+  //     }`
+  //   : generateAvatarUrl(
+  //       user.getFullName?.() || `${user.firstName} ${user.lastName}`
+  //     );
 
+  const profileImageUrl = user.profileImage
   return (
     <div
       className={`bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow ${className}`}

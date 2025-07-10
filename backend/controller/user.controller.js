@@ -2,16 +2,21 @@ import { UserService } from "../service/userService.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const profileImagePath = req.file
-      ? `/uploads/profiles/${req.file.filename}`
-      : null;
-    const user = await UserService.createUser(req.body, profileImagePath);
+    // const profileImagePath = req.file
+    //   ? `/uploads/profiles/${req.file.filename}`
+    //   : null;
+
+    let profileImage = null;
+    if (req.file && req.file.path) {
+      profileImage = req.file.path;
+    }
+    const user = await UserService.createUser(req.body, profileImage);
 
     res.status(201).json({
       success: true,
       message:
         "User registered successfully. Please check your email for verification.",
-      data: { userId: user.id, email: user.email },
+      data: { userId: user.id, email: user.email, user },
     });
   } catch (error) {
     res.status(400).json({
@@ -144,15 +149,33 @@ export const getUserProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const profileImagePath = req.file
-      ? `/uploads/profiles/${req.file.filename}`
-      : null;
+    // const profileImagePath = req.file
+    //   ? `/uploads/profiles/${req.file.filename}`
+    //   : null;
+    // const user = await UserService.updateProfile(
+    //   userId,
+    //   req.body,
+    //   profileImagePath
+    // );
+    let profileImagePath = null;
+    if (req.file && req.file.path) {
+      // Remove old image if exists and is a Cloudinary image
+      const user = await UserService.getUserById(userId);
+      if (user.profileImage && user.profileImage.includes("cloudinary.com")) {
+        // Extract public_id from URL
+        const urlParts = user.profileImage.split("/");
+        const fileName = urlParts[urlParts.length - 1];
+        const publicId = `maxlence_users/${fileName.split(".")[0]}`;
+        await cloudinary.uploader.destroy(publicId);
+      }
+      profileImagePath = req.file.path;
+    }
+
     const user = await UserService.updateProfile(
       userId,
       req.body,
       profileImagePath
     );
-
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",

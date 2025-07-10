@@ -31,14 +31,16 @@ import {
   loginLimiter,
   passwordResetLimiter,
 } from "../middleware/rateLimiter.js";
+import upload from "../config/multer.js";
 
 const router = Router();
 
 // Public routes
 router.post(
   "/register",
-  uploadProfileImage,
-  handleMulterError,
+  // uploadProfileImage,
+  // handleMulterError,
+  upload.single("profileImage"),
   validateRegistration,
   registerUser
 );
@@ -59,8 +61,9 @@ router.get("/me", getCurrentUser);
 router.post("/logout", logout);
 router.put(
   "/profile",
-  uploadProfileImage,
-  handleMulterError,
+  // uploadProfileImage,
+  // handleMulterError,
+  upload.single("profileImage"),
   validateUpdateProfile,
   updateProfile
 );
