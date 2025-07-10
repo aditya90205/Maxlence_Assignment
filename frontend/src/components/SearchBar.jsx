@@ -1,29 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { debounce } from "../utils/helpers.js";
 import Input from "./Input.jsx";
 import Button from "./Button.jsx";
 
 const SearchBar = ({
+  searchTerm,
+  onSearchChange,
   onSearch,
   placeholder = "Search...",
   debounceMs = 300,
   className = "",
   showClearButton = true,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
   // Create debounced search function
-  const debouncedSearch = debounce((term) => {
-    onSearch(term);
-  }, debounceMs);
+  const debouncedSearch = useRef(
+    debounce((term) => {
+      onSearch(term);
+    }, debounceMs)
+  ).current;
 
   useEffect(() => {
     debouncedSearch(searchTerm);
   }, [searchTerm, debouncedSearch]);
 
+  const handleChange = (e) => {
+    onSearchChange(e.target.value);
+  };
+
   const handleClear = () => {
-    setSearchTerm("");
+    onSearchChange("");
     onSearch("");
   };
 
@@ -33,7 +39,7 @@ const SearchBar = ({
         type="text"
         placeholder={placeholder}
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleChange}
         leftIcon={<Search size={20} />}
         rightIcon={
           showClearButton &&

@@ -23,7 +23,7 @@ const DashboardPage = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const usersPerPage = 12;
+  const usersPerPage = 6;
 
   const fetchUsers = async (page = 1, search = "") => {
     try {
@@ -48,6 +48,10 @@ const DashboardPage = () => {
   const handleSearch = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
+  };
+
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
   };
 
   const handlePageChange = (page) => {
@@ -235,6 +239,8 @@ const DashboardPage = () => {
       {/* Search and Filters */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
           onSearch={handleSearch}
           placeholder="Search users by name or email..."
           className="w-full sm:max-w-md"
