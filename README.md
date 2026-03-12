@@ -78,6 +78,15 @@ docker-compose up -d
 
 ---
 
+## 🔑 Demo Credentials
+
+To test the **Admin** features (like deleting users), you can use the following account:
+
+- **Email:** `sonusrivastava448@gmcil.com`
+- **Password:** `Aditya@90206`
+
+---
+
 ## 🔑 Key Features
 - ✅ **Secure Authentication**: JWT-based login and registration.
 - ✅ **Google OAuth**: One-click login with Google.

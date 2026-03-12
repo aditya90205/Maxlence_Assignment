@@ -17,7 +17,7 @@ const Dashboard = () => {
   const fetchUsers = async (currentPage, searchQuery) => {
     try {
       setLoading(true);
-      const res = await api.get(`/users?page=${currentPage}&limit=5&search=${searchQuery}`);
+      const res = await api.get(`/users?page=${currentPage}&limit=2&search=${searchQuery}`);
       setUsers(res.data.users);
       setTotalPages(res.data.totalPages);
     } catch (error) {
