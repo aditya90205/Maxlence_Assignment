@@ -132,7 +132,7 @@ const Dashboard = () => {
                     {isAdmin && user.id !== currentUser.id && (
                       <button 
                         onClick={() => handleDelete(user.id)}
-                        className="text-slate-500 hover:text-red-400 hover:bg-red-400/10 p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                        className="text-slate-500 hover:text-red-400 hover:bg-red-400/10 p-2 rounded-lg transition-colors"
                         title="Delete User"
                       >
                         <FontAwesomeIcon icon={faTrashAlt} />

@@ -7,7 +7,15 @@ import api from '../api/axios';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [user, setUser] = React.useState(JSON.parse(localStorage.getItem('user') || '{}'));
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      setUser(JSON.parse(localStorage.getItem('user') || '{}'));
+    };
+    window.addEventListener('user-updated', handleUpdate);
+    return () => window.removeEventListener('user-updated', handleUpdate);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -27,7 +35,7 @@ const Navbar = () => {
         <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
           <FontAwesomeIcon icon={faCube} className="text-white text-sm" />
         </div>
-        MyApp
+        Maxlence App
       </Link>
       <div className="flex gap-4 md:gap-6 items-center">
         <Link 

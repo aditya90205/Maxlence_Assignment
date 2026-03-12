@@ -46,6 +46,7 @@ const Profile = () => {
       });
       
       localStorage.setItem('user', JSON.stringify(response.data));
+      window.dispatchEvent(new Event('user-updated'));
       toast.success('Profile updated successfully!');
       
       if (response.data.profile_image) {
@@ -93,7 +94,7 @@ const Profile = () => {
                 </div>
                 
                 <input 
-                  type="hidden" 
+                  type="file" 
                   id="profileImage" 
                   className="hidden" 
                   accept="image/*" 
@@ -133,14 +134,12 @@ const Profile = () => {
             <div>
               <label className="form-label">Email Address</label>
               <input 
-                className="input-field" 
+                className="input-field opacity-60 cursor-not-allowed" 
                 type="email" 
-                {...register('email', { 
-                  required: 'Email is required',
-                  pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' }
-                })} 
+                readOnly
+                {...register('email')} 
               />
-              {errors.email && <span className="form-error">{errors.email.message}</span>}
+              <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">Email cannot be changed</p>
             </div>
           </div>
 
